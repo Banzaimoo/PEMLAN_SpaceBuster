@@ -1,48 +1,32 @@
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
 
-public class Pesawat extends JLabel implements KeyListener{
-
+public class Pesawat extends JLabel implements KeyListener {
     int moveDir = 0;
     int speed = 10;
 
-    public Pesawat(){
-        this.setBackground(Color.CYAN);
-        this.setBounds(477,550 , 70, 100);
-        this.setOpaque(true);
+    public Pesawat() {
+        this.setIcon(new ImageIcon("assets/pesawat.png"));
+        this.setBounds(477, 550, 100, 100);
     }
 
-    public void moveControl(int moveDirection){
-        switch (moveDirection) {
-            case 1 -> // Move right
-                this.moveRight();
-            case 2 -> // Move left
-                this.moveLeft();
-            default -> {
-            }
-        }
+    public void moveControl(int moveDirection) {
+        if (moveDirection == 1) moveRight();
+        else if (moveDirection == 2) moveLeft();
     }
 
-    public void moveRight(){
-        int x = this.getX();
-        int y = this.getY();
-        this.setLocation(x + speed, y);
+    public void moveRight() {
+        this.setLocation(getX() + speed, getY());
     }
 
-    public void moveLeft(){
-        int x = this.getX();
-        int y = this.getY();
-        this.setLocation(x - speed, y);
+    public void moveLeft() {
+        this.setLocation(getX() - speed, getY());
     }
 
     public void shoot() {
         Bullet bullet = new Bullet(this);
-        Thread bulletThread = new Thread(bullet);
-        bulletThread.start();
-        Window.addComponent(bullet, 2);
-        Window.mainPanel.repaint();
+        Window.addComponent(bullet, 3);
     }
 
     @Override
@@ -79,7 +63,5 @@ public class Pesawat extends JLabel implements KeyListener{
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        // Not used
-    }
+    public void keyTyped(KeyEvent e) {}
 }
