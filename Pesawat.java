@@ -2,9 +2,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
 
-public class Pesawat extends JLabel implements KeyListener {
+public class Pesawat extends JLabel implements KeyListener, Runnable {
     int moveDir = 0;
     int speed = 10;
+    boolean isDead = false;
 
     public Pesawat() {
         this.setIcon(new ImageIcon("assets/pesawat.png"));
@@ -24,9 +25,19 @@ public class Pesawat extends JLabel implements KeyListener {
         this.setLocation(getX() - speed, getY());
     }
 
+    // ini di override buat setiap subclass
     public void shoot() {
-        Bullet bullet = new Bullet(this);
+        Bullet bullet = new Bullet(this, 10, 30);
+        bullet.start();
         Window.addComponent(bullet, 3);
+    }
+
+    public void sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
@@ -55,8 +66,8 @@ public class Pesawat extends JLabel implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyChar()) {
-            case 'd' -> moveDir = 0; // Stop moving when the key is released
-            case 'a' -> moveDir = 0; // Stop moving when the key is released
+            case 'd' -> moveDir = 0; 
+            case 'a' -> moveDir = 0; 
             default -> {
             }
         }
@@ -64,4 +75,17 @@ public class Pesawat extends JLabel implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {}
+
+    public void start() {
+        Thread thread = new Thread(this);
+        thread.start();
+    }
+
+    @Override
+    public void run() {
+        while(!isDead){
+            moveControl(moveDir);
+            sleep(16);
+        }
+    }
 }

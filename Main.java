@@ -1,15 +1,17 @@
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.ArrayList;
+import javax.swing.JLabel;
 
 public class Main {
     static Window window = new Window();
     static Pesawat pesawat = new Pesawat();
-    static ArrayList<Enemy> enemyList = new ArrayList<>();
 
     public static void main(String[] args) {
         Window.mainPanel.addKeyListener(pesawat);
         Window.addComponent(pesawat, 1);
         window.setVisible(true);
+
+        pesawat.start();
 
         long lastsec = System.currentTimeMillis();
         long lastEnemySpawn = System.currentTimeMillis();
@@ -17,43 +19,50 @@ public class Main {
         while (true) {
             long millis = System.currentTimeMillis();
             while (millis - lastsec >= 16f) {
-                if (pesawat.moveDir != 0) pesawat.moveControl(pesawat.moveDir);
+                //System.out.println("Enemies: " + Enemy.enemies.size() + ", Bullets: " + Bullet.bullets.size());
 
-                // Move bullets
-                ArrayList<Bullet> bulletsCopy = new ArrayList<>(Bullet.bullets);
-                for (Bullet b : bulletsCopy) b.move();
+                ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+                ArrayList<Enemy> enemiesToRemove = new ArrayList<>();
 
-                // Move enemies
-                ArrayList<Enemy> enemiesCopy = new ArrayList<>(enemyList);
-                for (Enemy e : enemiesCopy) e.move();
-
-                // Collision detection
-                for (Enemy enemy : new ArrayList<>(enemyList)) {
-                    Rectangle enemyBounds = enemy.getBounds();
-                    for (Bullet bullet : new ArrayList<>(Bullet.bullets)) {
-                        if (enemyBounds.intersects(bullet.getBounds())) {
+                for (Enemy enemy : Enemy.enemies) {
+                    for (Bullet bullet : Bullet.bullets) {
+                        if (CheckCollsion(enemy, bullet)) {
                             Explosion explosion = new Explosion(enemy.getX(), enemy.getY());
                             Window.addComponent(explosion, 3);
                             explosion.start();
                             Window.removeComponent(enemy);
                             Window.removeComponent(bullet);
-                            enemyList.remove(enemy);
-                            Bullet.bullets.remove(bullet);
+                            bulletsToRemove.add(bullet);
+                            enemiesToRemove.add(enemy);
                             break;
                         }
                     }
                 }
 
+                // Remove bullets and enemies that collided
+                for (Bullet bullet : bulletsToRemove) {
+                    Bullet.bullets.remove(bullet);
+                } 
+                for (Enemy enemy : enemiesToRemove) {
+                    Enemy.enemies.remove(enemy);
+                }
+
                 // Spawn enemy every 2 seconds
-                if (millis - lastEnemySpawn >= 2000) {
+                if (millis - lastEnemySpawn >= 500) {
                     Enemy enemy = new Enemy();
+                    enemy.start();
                     Window.addComponent(enemy, 2);
-                    enemyList.add(enemy);
                     lastEnemySpawn = millis;
                 }
 
                 lastsec = millis;
             }
         }
+    }
+
+    public static boolean CheckCollsion(JLabel a, JLabel b) {
+        Rectangle rectA = a.getBounds();
+        Rectangle rectB = b.getBounds();
+        return rectA.intersects(rectB);
     }
 }

@@ -11,7 +11,6 @@ public class Explosion extends JLabel implements Runnable {
         thread.start();
     }
 
-
     @Override
     public void run() {
         try {
