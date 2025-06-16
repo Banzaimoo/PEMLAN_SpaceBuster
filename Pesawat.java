@@ -7,6 +7,12 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
     int speed = 10;
     boolean isDead = false;
 
+    // Shooting interval in milliseconds
+    private final int shootInterval = 500;
+    
+    // Timestamp of last shot fired
+    private long lastShootTime = 0;
+
     public Pesawat() {
         this.setIcon(new ImageIcon("assets/pesawat.png"));
         this.setBounds(477, 550, 100, 100);
@@ -18,18 +24,30 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
     }
 
     public void moveRight() {
-        this.setLocation(getX() + speed, getY());
+        // Keep ship within window bounds (0 to window width - width)
+        int newX = Math.min(getX() + speed, 1024 - this.getWidth());
+        this.setLocation(newX, getY());
     }
 
     public void moveLeft() {
-        this.setLocation(getX() - speed, getY());
+        int newX = Math.max(getX() - speed, 0);
+        this.setLocation(newX, getY());
     }
 
-    // ini di override buat setiap subclass
+    // Modified shoot method to fire 4 lasers
     public void shoot() {
-        Bullet bullet = new Bullet(this, 10, 30);
-        bullet.start();
-        Window.addComponent(bullet, 3);
+        int baseX = this.getX();
+        int baseY = this.getY();
+
+        int laserSpacing = 25;  // spacing between lasers
+
+        // Fire 4 bullets horizontally spaced
+        for (int i = 0; i < 4; i++) {
+            int bulletX = baseX + 10 + i * laserSpacing;
+            Bullet bullet = new Bullet(this, 10, bulletX - baseX);
+            bullet.start();
+            Window.addComponent(bullet, 3);
+        }
     }
 
     public void sleep(int ms) {
@@ -50,7 +68,7 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
                 moveDir = 2;
                 break;
             case ' ':
-                System.out.println("Space pressed, shooting bullet...");
+                // Optional: still allow manual shot on space
                 shoot();
                 break;
             case 'q':
@@ -66,10 +84,9 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyChar()) {
-            case 'd' -> moveDir = 0; 
-            case 'a' -> moveDir = 0; 
-            default -> {
-            }
+            case 'd' -> moveDir = 0;
+            case 'a' -> moveDir = 0;
+            default -> {}
         }
     }
 
@@ -83,9 +100,18 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
 
     @Override
     public void run() {
-        while(!isDead){
+        lastShootTime = System.currentTimeMillis();
+        while (!isDead) {
             moveControl(moveDir);
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastShootTime >= shootInterval) {
+                shoot();
+                lastShootTime = currentTime;
+            }
+
             sleep(16);
         }
     }
 }
+

@@ -4,7 +4,7 @@ import javax.swing.JLabel;
 
 public class Main {
     static Window window = new Window();
-    static Pesawat pesawat = new Pesawat();
+    static Pesawat pesawat = new Stinger(); // Ganti dengan Fighter() atau Stinger() sesuai kebutuhan
 
     public static void main(String[] args) {
         Window.mainPanel.addKeyListener(pesawat);
