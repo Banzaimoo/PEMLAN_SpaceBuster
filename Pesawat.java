@@ -5,11 +5,11 @@ import javax.swing.*;
 public class Pesawat extends JLabel implements KeyListener, Runnable {
     int moveDir = 0;
     int speed = 10;
-    boolean isDead = false;
+    public boolean isDead = false;
 
     // Shooting interval in milliseconds
     private final int shootInterval = 500;
-    
+
     // Timestamp of last shot fired
     private long lastShootTime = 0;
 
