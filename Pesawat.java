@@ -37,7 +37,6 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
     // Modified shoot method to fire 4 lasers
     public void shoot() {
         int baseX = this.getX();
-        int baseY = this.getY();
 
         int laserSpacing = 25;  // spacing between lasers
 
@@ -66,10 +65,6 @@ public class Pesawat extends JLabel implements KeyListener, Runnable {
                 break;
             case 'a':
                 moveDir = 2;
-                break;
-            case ' ':
-                // Optional: still allow manual shot on space
-                shoot();
                 break;
             case 'q':
                 System.exit(0);
